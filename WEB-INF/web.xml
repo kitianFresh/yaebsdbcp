@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0"
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+ 
+  <context-param>
+    <param-name>databaseURL</param-name>
+    <param-value>jdbc:mysql://localhost:3306/ebookshop?useSSL=false</param-value>
+  </context-param>
+  <context-param>
+    <param-name>username</param-name>
+    <param-value>root</param-value>
+  </context-param>
+  <context-param>
+    <param-name>password</param-name>
+    <param-value>777</param-value>
+  </context-param>
+ 
+  <servlet>
+    <servlet-name>EntryServlet</servlet-name>
+    <servlet-class>EntryServlet</servlet-class>
+  </servlet>
+ 
+  <servlet-mapping>
+    <servlet-name>EntryServlet</servlet-name>
+    <url-pattern>/start</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>QueryServlet</servlet-name>
+    <servlet-class>QueryServlet</servlet-class>
+  </servlet>
+ 
+  <servlet-mapping>
+    <servlet-name>QueryServlet</servlet-name>
+    <url-pattern>/search</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>OrderServlet</servlet-name>
+    <servlet-class>OrderServlet</servlet-class>
+  </servlet>
+ 
+  <servlet-mapping>
+    <servlet-name>OrderServlet</servlet-name>
+    <url-pattern>/order</url-pattern>
+  </servlet-mapping>
+ 
+  <session-config>
+    <session-timeout>30</session-timeout>
+  </session-config>
+  <welcome-file-list>
+    <welcome-file>start</welcome-file>
+  </welcome-file-list>
+</web-app>
