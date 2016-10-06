@@ -3,18 +3,27 @@ import java.sql.*;
 import java.util.logging.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
+import javax.sql.DataSource;
+import javax.naming.InitialContext;
+import javax.naming.*;
 
 public class OrderServlet extends HttpServlet {
-	private String databaseURL, username, password;
+	private DataSource pool;  // Database connection pool
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
-		// Retrieve the database-URL, username, password from webapp init parameters
-		super.init(config);
-		ServletContext context = config.getServletContext();
-		databaseURL = context.getInitParameter("databaseURL");
-		username = context.getInitParameter("username");
-		password = context.getInitParameter("password");
+		try {
+			// Create a JNDI Initial context to be able to lookup the DataSource
+			InitialContext ctx = new InitialContext();
+			// Lookup the DataSource, which will be backed by a pool
+			//  that the application server provides.
+			pool = (DataSource)ctx.lookup("java:comp/env/jdbc/mysql_ebookshop");
+			if (pool == null) {
+				throw new ServletException("Unknown DataSource 'jdbc/mysql_ebookshop'");
+			}
+		} catch (NamingException ex) {
+			Logger.getLogger(EntryServlet.class.getName()).log(Level.SEVERE, null, ex);
+		}
 	}
 
 	@Override
@@ -63,7 +72,7 @@ public class OrderServlet extends HttpServlet {
 				outBuf.append("<tr><td>Customer Email:</td><td>").append(custEmail).append("</td></tr>");
 				outBuf.append("<tr><td>Customer Phone Number:</td><td>").append(custPhone).append("</td></tr></table>");
 
-				conn = DriverManager.getConnection(databaseURL, username, password);
+				conn = pool.getConnection();
 				stmt = conn.createStatement();
 				// We shall manage our transaction (because multiple SQL statements issued)
 				conn.setAutoCommit(false);

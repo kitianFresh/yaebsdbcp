@@ -3,18 +3,27 @@ import java.sql.*;
 import java.util.logging.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
+import javax.sql.DataSource;
+import javax.naming.InitialContext;
+import javax.naming.*;
 
 public class EntryServlet extends HttpServlet {
-	private String databaseURL, username, password;
+	private DataSource pool;  // Database connection pool
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
-		// Retrieve the database-URL, username, password from webapp init parameters
-		super.init(config);
-		ServletContext context = config.getServletContext();
-		databaseURL = context.getInitParameter("databaseURL");
-		username = context.getInitParameter("username");
-		password = context.getInitParameter("password");
+		try {
+			// Create a JNDI Initial context to be able to lookup the DataSource
+			InitialContext ctx = new InitialContext();
+			// Lookup the DataSource, which will be backed by a pool
+			//  that the application server provides.
+			pool = (DataSource)ctx.lookup("java:comp/env/jdbc/mysql_ebookshop");
+			if (pool == null) {
+				throw new ServletException("Unknown DataSource 'jdbc/mysql_ebookshop'");
+			}
+		} catch (NamingException ex) {
+			Logger.getLogger(EntryServlet.class.getName()).log(Level.SEVERE, null, ex);
+		}
 	}
 
 	@Override
@@ -26,7 +35,8 @@ public class EntryServlet extends HttpServlet {
 		Connection conn = null;
 		Statement stmt = null;
 		try {
-			conn = DriverManager.getConnection(databaseURL, username, password);
+			//conn = DriverManager.getConnection(databaseURL, username, password);
+			conn = pool.getConnection(); // get a connection pool
 			stmt = conn.createStatement();
 			String sqlstr = "SELECT DISTINCT author FROM books WHERE qty > 0";
 			ResultSet rset = stmt.executeQuery(sqlstr);
@@ -63,7 +73,7 @@ public class EntryServlet extends HttpServlet {
 			out.close();
 			try {
 				if (stmt != null) stmt.close();
-				if (conn != null) conn.close();
+				if (conn != null) conn.close(); // return the connection pool
 			} catch (SQLException ex) {
 				Logger.getLogger(EntryServlet.class.getName()).log(Level.SEVERE, null, ex);
 			}
