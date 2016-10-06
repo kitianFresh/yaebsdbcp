@@ -143,6 +143,7 @@ public class CheckoutServlet extends HttpServlet {
 			conn.commit();
 
 			out.println("</body></html>");
+			cart.clear(); // empty the cart
 		} catch (SQLException ex) {
 			try {
 				conn.rollback();  // rollback the updates
@@ -150,7 +151,7 @@ public class CheckoutServlet extends HttpServlet {
 			} catch (SQLException ex1) { }
 			Logger.getLogger(CheckoutServlet.class.getName()).log(Level.SEVERE, null, ex);
 		} finally {
-			cart.clear(); // empty the cart
+			//cart.clear(); // 不要在这里清空，因为当用户没输入名字或者其他原因导致的return，会执行这个finally导致cart清空
 			out.close();
 			try {
 				if (stmt != null) stmt.close();
