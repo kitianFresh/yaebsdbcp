@@ -51,7 +51,7 @@ public class QueryServlet extends HttpServlet {
 				conn = pool.getConnection();
 				stmt = conn.createStatement();
 
-				// Form aa SQL command based on the param(s) present
+				// Form a SQL command based on the param(s) present
 				StringBuilder sqlstr = new StringBuilder(); // more efficient than String
 				sqlstr.append("SELECT * FROM books WHERE qty > 0 AND (");
 				if (hasAuthorParam) {
@@ -74,7 +74,8 @@ public class QueryServlet extends HttpServlet {
 				}
 				else {
 					// Print the result in an HTML from inside a table
-					out.println("<form method='get' action='order'>");
+					out.println("<form method='get' action='cart'>");
+					out.println("<input type='hidden' name='todo' value='add' />");
 					out.println("<table border='1' cellpadding='6'>");
 					out.println("<tr>");
 					out.println("<th>&nbsp;</th>");
@@ -94,37 +95,41 @@ public class QueryServlet extends HttpServlet {
 		                out.println("<td><input type='text' size='3' value='1' name='qty" + id + "' /></td>");
 		                out.println("</tr>");
 	               	} while (rset.next());
-
 	               	out.println("</table><br />");
  
-               		// Ask for name, email and phone using text fields (arranged in a table)
-               		out.println("<table>");
-               		out.println("<tr><td>Enter your Name:</td>");
-               		out.println("<td><input type='text' name='cust_name' /></td></tr>");
-               		out.println("<tr><td>Enter your Email (user@host):</td>");
-               		out.println("<td><input type='text' name='cust_email' /></td></tr>");
-               		out.println("<tr><td>Enter your Phone Number (8-digit):</td>");
-               		out.println("<td><input type='text' name='cust_phone' /></td></tr></table><br />");
- 
+     
                		// Submit and reset buttons
-               		out.println("<input type='submit' value='ORDER' />");
+               		out.println("<input type='submit' value='Add to My Shopping Cart' />");
                		out.println("<input type='reset' value='CLEAR' /></form>");
  
                		// Hyperlink to go back to search menu
                		out.println("<p><a href='start'>Back to Select Menu</a></p>");
+
+               		// Show "View Shopping Cart" if the cart is not empty
+		        	HttpSession session = request.getSession(false); //check if session exists
+		        	if (session != null) {
+		        		Cart cart;
+		        		synchronized (session) {
+		        			// Retrieve the shopping cart for this session, if any. Otherwise, create one.
+		        			cart = (Cart) session.getAttribute("cart");
+		        			if (cart != null && !cart.isEmpty()) {
+		        				out.println("<P><a href='cart?todo=view'>View Shopping Cart</a></p>");
+		        			}
+		        		}
+		        	}
 				}
 			} 
 			out.println("</body></html>");
 		} catch (SQLException ex) {
 			out.println("<h3>Service not available. Please try again later!</h3></body></html>");
-			Logger.getLogger(EntryServlet.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(QueryServlet.class.getName()).log(Level.SEVERE, null, ex);
 		} finally {
 			out.close();
 			try {
 				if (stmt != null) stmt.close();
 				if (conn != null) conn.close();
 			} catch (SQLException ex) {
-				Logger.getLogger(EntryServlet.class.getName()).log(Level.SEVERE, null, ex);
+				Logger.getLogger(QueryServlet.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 

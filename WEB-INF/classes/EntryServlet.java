@@ -65,6 +65,19 @@ public class EntryServlet extends HttpServlet {
 	        out.println("<input type='reset' value='CLEAR' />");
         	out.println("</form>");
 
+        	// Show "View Shopping Cart" if the cart is not empty
+        	HttpSession session = request.getSession(false); //check if session exists
+        	if (session != null) {
+        		Cart cart;
+        		synchronized (session) {
+        			// Retrieve the shopping cart for this session, if any. Otherwise, create one.
+        			cart = (Cart) session.getAttribute("cart");
+        			if (cart != null && !cart.isEmpty()) {
+        				out.println("<P><a href='cart?todo=view'>View Shopping Cart</a></p>");
+        			}
+        		}
+        	}
+
         	out.println("</body></html>");
 		} catch (SQLException ex) {
 			out.println("<h3>Service not available. Please try again later!</h3></body></html>");
@@ -79,5 +92,11 @@ public class EntryServlet extends HttpServlet {
 			}
 		}
 
+	}
+
+	@Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doGet(request, response);
 	}
 }
