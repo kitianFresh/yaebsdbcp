@@ -74,6 +74,14 @@ public class CartServlet extends HttpServlet {
 	            }
 
 	            for (String id : ids) {
+					// Get quantity ordered - and check by InputFilter
+					int qtyOrdered = InputFilter.parsePositiveInt(request.getParameter("qty" + id));
+					int idInt = InputFilter.parsePositiveInt(id);
+					if (idInt == 0 || qtyOrdered == 0) {
+						out.println("<h3>Please Check your book quantity or book id!</h3></body></html>");
+						return;
+					}
+
 					sqlstr = "SELECT * FROM books WHERE id = " + id;
 					//System.out.println(sqlstr);  // for debugging
 					rset = stmt.executeQuery(sqlstr);
@@ -82,9 +90,7 @@ public class CartServlet extends HttpServlet {
 					String author = rset.getString("author");
 					float price = rset.getFloat("price");
 
-					// Get quantity ordered - no error check!
-					int qtyOrdered = Integer.parseInt(request.getParameter("qty" + id));
-					int idInt = Integer.parseInt(id);
+					
 					if (todo.equals("add")) {
 					  cart.add(idInt, title, author, price, qtyOrdered);
 					} else if (todo.equals("update")) {
@@ -94,7 +100,7 @@ public class CartServlet extends HttpServlet {
          	}
          	else if (todo.equals("remove")) {
          		String id = request.getParameter("id"); //Only one id for remove case
-         		cart.remove(Integer.parseInt(id));
+         		cart.remove(InputFilter.parsePositiveInt(id));
          	}
 
          	// All cases - Always display the shopping cart

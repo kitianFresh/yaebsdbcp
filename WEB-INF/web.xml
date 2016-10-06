@@ -12,33 +12,43 @@
    </resource-ref>
  
   <servlet>
-    <servlet-name>EntryServlet</servlet-name>
+    <servlet-name>Entry</servlet-name>
     <servlet-class>EntryServlet</servlet-class>
   </servlet>
  
   <servlet-mapping>
-    <servlet-name>EntryServlet</servlet-name>
+    <servlet-name>Entry</servlet-name>
     <url-pattern>/start</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>QueryServlet</servlet-name>
+    <servlet-name>Query</servlet-name>
     <servlet-class>QueryServlet</servlet-class>
   </servlet>
  
   <servlet-mapping>
-    <servlet-name>QueryServlet</servlet-name>
+    <servlet-name>Query</servlet-name>
     <url-pattern>/search</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>OrderServlet</servlet-name>
-    <servlet-class>OrderServlet</servlet-class>
+    <servlet-name>Cart</servlet-name>
+    <servlet-class>CartServlet</servlet-class>
   </servlet>
  
   <servlet-mapping>
-    <servlet-name>OrderServlet</servlet-name>
-    <url-pattern>/order</url-pattern>
+    <servlet-name>Cart</servlet-name>
+    <url-pattern>/cart</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>Checkout</servlet-name>
+    <servlet-class>CheckoutServlet</servlet-class>
+  </servlet>
+ 
+  <servlet-mapping>
+    <servlet-name>Checkout</servlet-name>
+    <url-pattern>/checkout</url-pattern>
   </servlet-mapping>
  
   <session-config>
