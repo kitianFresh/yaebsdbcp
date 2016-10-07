@@ -210,10 +210,10 @@ Tan Ah Teck, More Java for dummies, $22.22
 &emsp;&emsp;如果你只是使用同一个浏览器发送请求，因为服务端将data存储到session的缘故，你的shopping cart状态得以维持，因为对于和shoppingcart相关的每一个请求，都会使用request.getSession获取这个全局的session。取出数据并返回给客户端；但是如果是换了另一个浏览器呢？
 
 &emsp;&emsp;我同时使用chrome和firefox进行购物车操作，发现尽然互不影响，这说明tomcat8 webcontainer使用了方法来辨别request来自是哪一个浏览器；进过测验之后发现，其实在/start对应的EntryServlet和/search对应的QueryServlet还有/checkout对应的CheckoutServlet都使用request.getSession(false);//已经存在就返回，不存在什么都不干！ 而在CartServlet中使用request.getSession(true);//已经存在就返回，不存则创建一个！
-![/start](https://github.com/kitianFresh/yaebsdbcp/tree/yaebsum/images/start.png)
-![/search](https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/search.png)
-![/cart](https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/cart.png)
-![/start](https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/start-cookie-request.png)
+![start](https://github.com/kitianFresh/yaebsdbcp/tree/yaebsum/images/start.png)
+![search](https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/search.png)
+![cart](https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/cart.png)
+![start](https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/start-cookie-request.png)
 ![JSESSIONID](https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/JSESSIONID.png)
 
 
