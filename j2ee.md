@@ -212,14 +212,19 @@ Tan Ah Teck, More Java for dummies, $22.22
 &emsp;&emsp;我同时使用chrome和firefox进行购物车操作，发现尽然互不影响，这说明tomcat8 webcontainer使用了方法来辨别request来自是哪一个浏览器；进过测验之后发现，其实在/start对应的EntryServlet和/search对应的QueryServlet还有/checkout对应的CheckoutServlet都使用request.getSession(false);//已经存在就返回，不存在什么都不干！ 而在CartServlet中使用request.getSession(true);//已经存在就返回，不存则创建一个！
 
 ![start](https://github.com/kitianFresh/yaebsdbcp/tree/yaebsum/images/start.png)
+&emsp;&emsp;/start
 
 ![search](https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/search.png)
+&emsp;&emsp;/search
 
 ![cart](https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/cart.png)
+&emsp;&emsp;/cart
 
 ![start](https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/start-cookie-request.png)
+&emsp;&emsp;/start
 
 ![JSESSIONID](https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/JSESSIONID.png)
+&emsp;&emsp;JsessionId
 
 
 &emsp;&emsp;实验也证明合理我们在（没有请求过/cart前提下）请求/start和/search时，request和response header中都没有Cookie
