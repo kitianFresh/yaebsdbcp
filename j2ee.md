@@ -216,8 +216,8 @@ Tan Ah Teck, More Java for dummies, $22.22
 >>always return true.
 
 ## 参考
-[How to Install Apache Tomcat 8.0.x on Linux](http://linoxide.com/linux-how-to/install-tomcat-8-0-x-linux/)
-[Setting up environment for JEE development under Ubuntu/Debian](http://sukharevd.net/environment-for-j2ee-development-under-ubuntu.html#tomcat)
-[defference between /sbin/nologin and /bin/false](http://serverfault.com/questions/519215/what-is-the-difference-between-sbin-nologin-and-bin-false)
-[Does /usr/sbin/nologin as a login shell serve a security purpose?](http://unix.stackexchange.com/questions/155139/does-usr-sbin-nologin-as-a-login-shell-serve-a-security-purpose)
-[How To Install Apache Tomcat 8 on Ubuntu 16.04](https://www.digitalocean.com/community/tutorials/how-to-install-apache-tomcat-8-on-ubuntu-16-04)
+  - [How to Install Apache Tomcat 8.0.x on Linux](http://linoxide.com/linux-how-to/install-tomcat-8-0-x-linux/)
+  - [Setting up environment for JEE development under Ubuntu/Debian](http://sukharevd.net/environment-for-j2ee-development-under-ubuntu.html#tomcat)
+  - [defference between /sbin/nologin and /bin/false](http://serverfault.com/questions/519215/what-is-the-difference-between-sbin-nologin-and-bin-false)
+  - [Does /usr/sbin/nologin as a login shell serve a security purpose?](http://unix.stackexchange.com/questions/155139/does-usr-sbin-nologin-as-a-login-shell-serve-a-security-purpose)
+  - [How To Install Apache Tomcat 8 on Ubuntu 16.04](https://www.digitalocean.com/community/tutorials/how-to-install-apache-tomcat-8-on-ubuntu-16-04)
