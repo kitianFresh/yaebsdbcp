@@ -24,7 +24,10 @@ sudo service tomcat8 start/stop/restart
 
 ### Install Manually
 #### Step 1: Download
-&emsp;&emsp;可以去[官网](http://tomcat.apache.org)下载tomcat8.0.37，选择Binary distribution => Core => Download 来下载"tar.gz"格式的包;也可以使用命令(wget http://apache.fayea.com/tomcat/tomcat-8/v8.0.37/bin/apache-tomcat-8.0.37.tar.gz)下载8.5.5版本;
+&emsp;&emsp;可以去[官网](http://tomcat.apache.org)下载tomcat8.0.37，选择Binary distribution => Core => Download 来下载"tar.gz"格式的包;也可以使用命令下载8.0
+```
+wget http://apache.fayea.com/tomcat/tomcat-8/v8.0.37/bin/apache-tomcat-8.0.37.tar.gz)
+```
 
 #### Step 2: Install
 &emsp;&emsp;首先解压并创建软链接
@@ -107,7 +110,7 @@ sudo service tomcat8 restart
 sudo useradd -s /sbin/nologin tomcat8                 # add user to run tomcat service
 ```
 
-&emsp;&emsp;这里关于用户管理只讲解本教程相关问题，更多请参考鸟哥私房菜；再一次提醒，**linux下的终端terminal不是shell**，千万不要被表面迷惑；我们都知道linux是**多用户多任务的系统**；但是由于现在我们都是用微机也就是个人电脑，基本上就你一个人在用，所以没有感觉什么叫多用户多任务；如果回到过去，没有盖茨和乔布斯的时代，那个时候个人是很难用到电脑的，你要用计算机，你得申请某一个时段，到机房去，在一个显示器面前使用命令行，登陆，然后进项相应任务，但你看到的并不是主机，那只是从大型主机连接过来的显示器或者说终端（现在你应该知道为啥叫terminal了吧），所以很多个科学家登陆到同一台主机同一时间段做任务，这就需要主机操作系统可以进行多用户多任务管理了。
+&emsp;&emsp;这里关于用户管理只讲解本教程相关问题，更多请参考鸟哥私房菜；再一次提醒，***linux下的终端terminal不是shell***，千万不要被表面迷惑；我们都知道linux是***多用户多任务的系统***；但是由于现在我们都是用微机也就是个人电脑，基本上就你一个人在用，所以没有感觉什么叫多用户多任务；如果回到过去，没有盖茨和乔布斯的时代，那个时候个人是很难用到电脑的，你要用计算机，你得申请某一个时段，到机房去，在一个显示器面前使用命令行，登陆，然后进项相应任务，但你看到的并不是主机，那只是从大型主机连接过来的显示器或者说终端（现在你应该知道为啥叫terminal了吧），所以很多个科学家登陆到同一台主机同一时间段做任务，这就需要主机操作系统可以进行多用户多任务管理了。
 
 &emsp;&emsp;同样，现在，我们人手一台计算机，其他人不用了，就你一个人用，当然可以同时执行多个任务，这个在操作系统分时调度任务大家应该都知道，并且如果你用的是Windows，你就更不可能很好的理解什么叫多用户了。如果是在linux下面，初学者也很少碰到多用户管理，因为一直是自己用。但是实际上，linux上有很多用户(**用户不一定是人，也可以是程序**)，并且有的还和你一起在同时使用linux呢。
 
@@ -200,12 +203,19 @@ Tan Ah Teck, More Java for dummies, $22.22
 &emsp;&emsp;不过，目前有结合三种方式一起使用，从而优化用户体验！
 
 &emsp;&emsp;发现如果不登陆京东，直接加入购物车，最多只能加50个item，此时只是在本地使用了cookie存储item；另外，如果你在chrome中禁用cookie，那么不登陆加入购物车的功能基本上是不能用的。而且而且很重要的一点，如果你禁用了cookie，京东根本无法登陆啊，有图有真相。这说明京东默认大家都使用cookie，并且登陆后设置使用cookie和user关联起来，当登陆以后，这些item会被添加到你的登陆后的购物车，并且云端同步到手机客户端，这说明登陆后在服务端存储了item，猜测可能时memcache或者database存储的；
+![jd-no-cookie-no-login](https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/jd_no_cookie_no_login.png)
 
 &emsp;&emsp;tomcat8提供的servlet中的session management也是如此，HttpSession实际上是需要客户端打开cookie的，如果禁止，即使你在服务端使用request.getSession(),那也是一个新的session了。并不能维持会话状态，亲自测验过了。
 
 &emsp;&emsp;如果你只是使用同一个浏览器发送请求，因为服务端将data存储到session的缘故，你的shopping cart状态得以维持，因为对于和shoppingcart相关的每一个请求，都会使用request.getSession获取这个全局的session。取出数据并返回给客户端；但是如果是换了另一个浏览器呢？
 
 &emsp;&emsp;我同时使用chrome和firefox进行购物车操作，发现尽然互不影响，这说明tomcat8 webcontainer使用了方法来辨别request来自是哪一个浏览器；进过测验之后发现，其实在/start对应的EntryServlet和/search对应的QueryServlet还有/checkout对应的CheckoutServlet都使用request.getSession(false);//已经存在就返回，不存在什么都不干！ 而在CartServlet中使用request.getSession(true);//已经存在就返回，不存则创建一个！
+![/start](https://github.com/kitianFresh/yaebsdbcp/tree/yaebsum/images/start.png)
+![/search](https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/search.png)
+![/cart](https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/cart.png)
+![/start](https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/start-cookie-request.png)
+![JSESSIONID](https://github.com/kitianFresh/yaebsdbcp/blob/yaebsum/images/JSESSIONID.png)
+
 
 &emsp;&emsp;实验也证明合理我们在（没有请求过/cart前提下）请求/start和/search时，request和response header中都没有Cookie
 ，因为他们都不创建session；但是当我第一次请求/cart时，response header中多了个Set-Cookie，因为第一次请求CartServlet是要创建新session的；此后一系列的request header中都自动添加了Cookie了；重要的事情来了，Tomcat8 中的Servlet都是单例模式，他是如何知道request来自哪里，又是如何轻而易举的通过request.getSession()获取到客户端想要的那个session呢？查看Set-Cookie选项你就知道了，原来服务端生成了一个JSESSIONID=4525C1896DCB743808B956F3EF9DC623唯一标示，这样servlet就可以轻而易举的维持不同session了；因为每一个请求都自带了这个ID。也就是说，**Servlet Session的实现依赖于客户端的cookie设置**,如果你要在禁止cookie的情况下也能实现会话，那么你需要做额外处理了。比如根据IP唯一表示（但ip也可能变化），或者让用户登陆 使用userid做唯一标示，最后就是将unique id隐藏在html中，每一次都通过url附带这个id参数发送出去，然后服务端取出来。
