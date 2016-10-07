@@ -24,7 +24,7 @@ sudo service tomcat8 start/stop/restart
 
 ### Install Manually
 #### Step 1: Download
-&emsp;&emsp;可以去[官网](http://tomcat.apache.org)下载tomcat8.0.37，选择Binary distribution => Core => Download 来下载"tar.gz    "格式的包;也可以使用命令wget http://apache.fayea.com/tomcat/tomcat-8/v8.0.37/bin/apache-tomcat-8.0.37.tar.gz下载8.5.5版本;
+&emsp;&emsp;可以去[官网](http://tomcat.apache.org)下载tomcat8.0.37，选择Binary distribution => Core => Download 来下载"tar.gz"格式的包;也可以使用命令(wget http://apache.fayea.com/tomcat/tomcat-8/v8.0.37/bin/apache-tomcat-8.0.37.tar.gz)下载8.5.5版本;
 
 #### Step 2: Install
 &emsp;&emsp;首先解压并创建软链接
@@ -196,17 +196,25 @@ Tan Ah Teck, More Java for dummies, $22.22
 
 ## HttpSession
 &emsp;&emsp;Http协议中说他自己时stateless即无状态的，什么意思？就是你的前一个请求是用户登陆，后一个请求是加入购物车（但是后一个请求并不知道你登陆了），请求之间并不能相互获取状态数据。如何解决这个问题？我们在设计一个类的时候，类的行为或者说函数会多次执行或者调用，类如何保证每次调用都知道当前自己状态（即上一次执行后的状态）呢？类的状态由成员变量来维持！同样，为了保持HTTP请求之间知道状态，你必须提供状态数据供每一次请求参考，这个数据状态的维持就抽象成了数据共享存储模型的设计，无非就是内存/文件/数据库（本质上也是文件）/消息 来维持了，就是现在比较流行的三种方式，客户端cookie（文件），服务端session（内存），数据库table。这样每一次Http请求都带上或者查询这些状态数据，就实现了状态的维持了！为什么不能用消息（比如上一次Http请求完成后，将数据以消息形式异步发送给下一个请求），我猜测可能的原因是消息太复杂了，没必要。消息发送接受还不是要开辟一块内存，不如直接存储在内存中供大家使用，使得程序更复杂，因此该场景不适合用消息。
+
 &emsp;&emsp;不过，目前有结合三种方式一起使用，从而优化用户体验！
+
 &emsp;&emsp;发现如果不登陆京东，直接加入购物车，最多只能加50个item，此时只是在本地使用了cookie存储item；另外，如果你在chrome中禁用cookie，那么不登陆加入购物车的功能基本上是不能用的。而且而且很重要的一点，如果你禁用了cookie，京东根本无法登陆啊，有图有真相。这说明京东默认大家都使用cookie，并且登陆后设置使用cookie和user关联起来，当登陆以后，这些item会被添加到你的登陆后的购物车，并且云端同步到手机客户端，这说明登陆后在服务端存储了item，猜测可能时memcache或者database存储的；
+
 &emsp;&emsp;tomcat8提供的servlet中的session management也是如此，HttpSession实际上是需要客户端打开cookie的，如果禁止，即使你在服务端使用request.getSession(),那也是一个新的session了。并不能维持会话状态，亲自测验过了。
+
 &emsp;&emsp;如果你只是使用同一个浏览器发送请求，因为服务端将data存储到session的缘故，你的shopping cart状态得以维持，因为对于和shoppingcart相关的每一个请求，都会使用request.getSession获取这个全局的session。取出数据并返回给客户端；但是如果是换了另一个浏览器呢？
+
 &emsp;&emsp;我同时使用chrome和firefox进行购物车操作，发现尽然互不影响，这说明tomcat8 webcontainer使用了方法来辨别request来自是哪一个浏览器；进过测验之后发现，其实在/start对应的EntryServlet和/search对应的QueryServlet还有/checkout对应的CheckoutServlet都使用request.getSession(false);//已经存在就返回，不存在什么都不干！ 而在CartServlet中使用request.getSession(true);//已经存在就返回，不存则创建一个！
+
 &emsp;&emsp;实验也证明合理我们在（没有请求过/cart前提下）请求/start和/search时，request和response header中都没有Cookie
 ，因为他们都不创建session；但是当我第一次请求/cart时，response header中多了个Set-Cookie，因为第一次请求CartServlet是要创建新session的；此后一系列的request header中都自动添加了Cookie了；重要的事情来了，Tomcat8 中的Servlet都是单例模式，他是如何知道request来自哪里，又是如何轻而易举的通过request.getSession()获取到客户端想要的那个session呢？查看Set-Cookie选项你就知道了，原来服务端生成了一个JSESSIONID=4525C1896DCB743808B956F3EF9DC623唯一标示，这样servlet就可以轻而易举的维持不同session了；因为每一个请求都自带了这个ID。也就是说，**Servlet Session的实现依赖于客户端的cookie设置**,如果你要在禁止cookie的情况下也能实现会话，那么你需要做额外处理了。比如根据IP唯一表示（但ip也可能变化），或者让用户登陆 使用userid做唯一标示，最后就是将unique id隐藏在html中，每一次都通过url附带这个id参数发送出去，然后服务端取出来。
+
 >>A servlet should be able to handle cases in which the client does not choose to join a session, such as when 
 >>cookies are intentionally turned off. Until the client joins the session, isNew returns true. If the client 
 >>chooses not to join the session, getSession will return a different session on each request, and isNew will 
 >>always return true.
+
 ## 参考
 [How to Install Apache Tomcat 8.0.x on Linux](http://linoxide.com/linux-how-to/install-tomcat-8-0-x-linux/)
 [Setting up environment for JEE development under Ubuntu/Debian](http://sukharevd.net/environment-for-j2ee-development-under-ubuntu.html#tomcat)
