@@ -24,20 +24,21 @@ sudo service tomcat8 start/stop/restart
 
 ### Install Manually
 #### Step 1: Download
-&emsp;&emsp;可以去[官网](http://tomcat.apache.org)下载tomcat8.0.37，选择Binary distribution => Core => Download 来下载"tar.gz"格式的包;也可以使用命令下载8.0
+&emsp;&emsp;可以去[官网](http://tomcat.apache.org)下载tomcat8.5.35，选择Binary distribution => Core => Download 来下载"tar.gz"格式的包;也可以使用命令下载8.0
 ```
-wget http://apache.fayea.com/tomcat/tomcat-8/v8.0.37/bin/apache-tomcat-8.0.37.tar.gz)
+wget http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-8/v8.5.35/bin/apache-tomcat-8.5.35.tar.gz
+
 ```
 
 #### Step 2: Install
 &emsp;&emsp;首先解压并创建软链接
 ```
 cd ~/Download # enter tomcat package dir
-sudo tar -xzf apache-tomcat-8.0.37.tar.gz -C /opt  # extract archieve to directory /opt
+sudo tar -xzf apache-tomcat-8.5.35.tar.gz -C /opt  # extract archieve to directory /opt
 
-// 这里创建一个软链接到apache-tomcat-8.0.37的目的就是方便以后更换tomcat版本，只用更换apache-tomcat-8.0.37目录下的内容即可
+// 这里创建一个软链接到apache-tomcat-8.5.35的目的就是方便以后更换tomcat版本，只用更换apache-tomcat-8.5.35目录下的内容即可
 // 另外，注意/opt/tomcat8后面不要带'/'
-sudo ln -s /opt/apache-tomcat-8.0.37/ /opt/tomcat8 # create link for conveniece
+sudo ln -s /opt/apache-tomcat-8.5.35/ /opt/tomcat8 # create link for conveniece
 ```
 
 
@@ -86,6 +87,37 @@ restart)
   ;;
 esac
 exit 0
+```
+
+加入服务Unit, /etc/systemd/system/tomcat8.service
+
+```
+[Unit]
+Description=Apache Tomcat Web Application Container
+After=network.target
+
+[Service]
+Type=forking
+
+Environment=JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre
+Environment=CATALINA_PID=/opt/tomcat8/temp/tomcat.pid
+Environment=CATALINA_HOME=/opt/tomcat8
+Environment=CATALINA_BASE=/opt/tomcat8
+Environment='CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
+Environment='JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom'
+
+ExecStart=/opt/tomcat8/bin/startup.sh
+ExecStop=/opt/tomcat8/bin/shutdown.sh
+
+User=qi
+Group=qi
+UMask=0007
+RestartSec=10
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
 ```
 
 &emsp;&emsp;最后启动服务
